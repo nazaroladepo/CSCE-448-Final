@@ -33,8 +33,6 @@ void initialize_glfw_idempotent()
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-        std::atexit([](){ glfwTerminate(); });
     });
 }
 
@@ -50,8 +48,6 @@ namespace window
 {
 thread_local int glfw_errno = 0;
 thread_local std::string glfw_errmsg = "";
-
-Window Window::instance{DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE};
 
 Window::Window(int width, int height, const char* title)
     : m_handle(nullptr)
@@ -76,6 +72,7 @@ Window::Window(int width, int height, const char* title)
 
     glfwSetFramebufferSizeCallback(m_handle, framebuffer_size_callback);
     glfwSetKeyCallback(m_handle, key_callback_outer);
+    glfwSetWindowUserPointer(m_handle, this);
 }
 
 Window::~Window()
@@ -103,15 +100,16 @@ void Window::poll_events()
     glfwPollEvents();
 }
 
-void Window::key_callback_outer(GLFWwindow*, int key, int scancode, int action, int mods)
+void Window::key_callback_outer(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    Window* window_outer = static_cast<Window*>(glfwGetWindowUserPointer(window));
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        instance.notify_should_close();
+        window_outer->notify_should_close();
     }
     else
     {
-        instance.m_key_cb(key, scancode, action, mods);
+        window_outer->m_key_cb(key, scancode, action, mods);
     }
 }
 } // namespace window

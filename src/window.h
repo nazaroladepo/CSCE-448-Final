@@ -9,10 +9,6 @@ namespace svm
 {
 namespace window
 {
-static constexpr const int DEFAULT_WIDTH = 800;
-static constexpr const int DEFAULT_HEIGHT = 600;
-static constexpr const char* const DEFAULT_TITLE = "Single View Modeling";
-
 extern thread_local int glfw_errno;
 extern thread_local std::string glfw_errmsg;
 
@@ -46,15 +42,13 @@ public:
     Window& operator=(const Window&) = delete;
     Window& operator=(Window&&) = delete;
 
-    ~Window();
+    Window(int width, int height, const char* title);
 
-    static Window instance;
+    ~Window();
 
     static void poll_events();
 
 private:
-    Window(int width, int height, const char* title);
-
     static void key_callback_outer(GLFWwindow*, int, int, int, int);
 
     GLFWwindow* m_handle;
