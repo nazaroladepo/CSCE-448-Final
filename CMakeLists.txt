@@ -36,9 +36,9 @@ file(COPY ${data} DESTINATION resources)
 ## dependencies ###############################################################
 ###############################################################################
 
-include_directories(glad/include)
+include_directories(external/glad/include)
 
-add_library(glad STATIC glad/src/glad.c)
+add_library(glad STATIC external/glad/src/glad.c)
 
 # This defines the variables <X>_LIBRARIES that containts all library names
 # that we need to link into the program.
