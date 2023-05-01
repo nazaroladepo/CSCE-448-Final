@@ -51,8 +51,8 @@ thread_local std::string glfw_errmsg = "";
 
 Window::Window(int width, int height, const char* title)
     : m_handle(nullptr)
-    , m_key_cb()
-    , m_mouse_cb()
+    , m_key_cb([](int,int,int,int){})
+    , m_mouse_cb([](double,double){})
 {
     initialize_glfw_idempotent();
 
