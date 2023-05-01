@@ -4,3 +4,5 @@ CMakeFiles/
 CPack*
 Makefile
 cmake_install.cmake
+
+.vscode/
