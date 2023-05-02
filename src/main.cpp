@@ -76,10 +76,6 @@ int main(int argc, const char* argv[])
     Camera camera;
     camera.z = 3;
     camera.set_screen(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    window.set_resize_callback([&camera](int width, int height)
-    {
-        camera.set_screen(width, height);
-    });
     window.set_keyboard_callback([&camera](int key, int, int action, int)
     {
         constexpr float move_size = 0.05;
@@ -102,6 +98,34 @@ int main(int argc, const char* argv[])
             break;
         };
     });
+    float last_cursor_x = 0.0;
+    float last_cursor_y = 0.0;
+    bool first_cursor_input = true;
+    window.set_cursor_pos_callback(
+        [&camera, &last_cursor_x, &last_cursor_y, &first_cursor_input](double x_pos, double y_pos)
+    {
+        constexpr float sensitivity = 10.0;
+
+        if (first_cursor_input)
+        {
+            last_cursor_x = static_cast<float>(x_pos);
+            last_cursor_y = static_cast<float>(y_pos);
+            first_cursor_input = false;
+        }
+
+        const float offset_x = static_cast<float>(x_pos) - last_cursor_x;
+        const float offset_y = static_cast<float>(y_pos) - last_cursor_y;
+
+        camera.yaw_left(offset_x / camera.screen_width * sensitivity);
+        camera.pitch_up(-offset_y / camera.screen_height * sensitivity);
+
+        last_cursor_x = x_pos;
+        last_cursor_y = y_pos;
+    });
+    window.set_resize_callback([&camera](int width, int height)
+    {
+        camera.set_screen(width, height);
+    });
 
     std::atexit([](){ glfwTerminate(); });
     while (!window.should_close())
@@ -109,10 +133,6 @@ int main(int argc, const char* argv[])
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        std::cout << camera.position().x << ' ' << camera.position().y << ' ' << camera.position().z << std::endl;
-        std::cout << camera.direction().x << ' ' << camera.direction().y << ' ' << camera.direction().z << std::endl;
-        std::cout << camera.aspect_ratio << std::endl;
         program.setUniformMat4("camera", camera.get_view_projection());
 
         texture.insert_to_unit_spot(GL_TEXTURE0);

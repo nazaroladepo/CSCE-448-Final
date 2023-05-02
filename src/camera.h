@@ -21,7 +21,8 @@ struct Camera
     template <typename Int>
     void set_screen(Int width, Int height)
     {
-        aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+        screen_width = static_cast<float>(width);
+        screen_height = static_cast<float>(height);
     }
 
     float x;
@@ -29,7 +30,8 @@ struct Camera
     float z;
     float pitch;
     float yaw = -90.0;
-    float aspect_ratio = 1.0;
+    float screen_width = 600.0;
+    float screen_height = 400.0;
     float fovy = 45.0;
 };
 } // namespace camera

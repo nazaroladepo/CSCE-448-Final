@@ -66,8 +66,11 @@ Window::Window(int width, int height, const char* title)
 
     glViewport(0, 0, width, height);
 
-    glfwSetFramebufferSizeCallback(m_handle, framebuffer_size_callback);
+    glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     glfwSetKeyCallback(m_handle, key_callback_outer);
+    glfwSetCursorPosCallback(m_handle, cursor_pos_callback);
+    glfwSetFramebufferSizeCallback(m_handle, framebuffer_size_callback);
     glfwSetWindowUserPointer(m_handle, this);
 }
 
@@ -111,6 +114,15 @@ void Window::key_callback_outer(GLFWwindow* window, int key, int scancode, int a
     else if (window_outer->m_key_cb)
     {
         window_outer->m_key_cb(key, scancode, action, mods);
+    }
+}
+
+void Window::cursor_pos_callback(GLFWwindow* window, double x_pos, double y_pos)
+{
+    Window* window_outer = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (window_outer->m_mouse_cb)
+    {
+        window_outer->m_mouse_cb(x_pos, y_pos);
     }
 }
 

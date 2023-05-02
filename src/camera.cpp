@@ -15,6 +15,7 @@ glm::mat4 Camera::get_view_projection() const
 {
     const glm::vec3 pos = position();
     const glm::mat4 view = glm::lookAt(pos, pos + direction(), global_up);
+    const float aspect_ratio = screen_width / screen_height;
     const glm::mat4 persp = glm::perspective(glm::radians(fovy), aspect_ratio, 0.1f, 100.0f);
     return persp * view;
 }
@@ -54,6 +55,7 @@ void Camera::move_forward(float d)
 void Camera::pitch_up(float deg)
 {
     pitch += deg;
+    pitch = glm::clamp(pitch, -90.0f, 90.0f);
 }
 
 void Camera::yaw_left(float deg)

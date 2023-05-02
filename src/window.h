@@ -48,7 +48,7 @@ public:
     }
 
     template <class CbFunc>
-    void set_mouse_callback(CbFunc&& cb)
+    void set_cursor_pos_callback(CbFunc&& cb)
     {
         m_mouse_cb = cb;
     }
@@ -70,6 +70,7 @@ public:
 
 private:
     static void key_callback_outer(GLFWwindow*, int, int, int, int);
+    static void cursor_pos_callback(GLFWwindow*, double, double);
     static void framebuffer_size_callback(GLFWwindow*, int, int);
 
     GLFWwindow* m_handle;
