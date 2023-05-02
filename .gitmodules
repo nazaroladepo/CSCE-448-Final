@@ -3,4 +3,7 @@
 	url = https://github.com/g-truc/glm
 [submodule "external/stb"]
 	path = external/stb
-	url = https://github.com/nothings/stb.git
+	url = https://github.com/nothings/stb
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw

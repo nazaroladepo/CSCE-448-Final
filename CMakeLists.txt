@@ -36,13 +36,19 @@ file(COPY ${data} DESTINATION resources)
 ## dependencies ###############################################################
 ###############################################################################
 
-include_directories(external/glad/include external/glm external/)
+set(CMAKE_OSX_ARCHITECTURES arm64)
+add_subdirectory(external/glfw external/glfw/build)
+
+include_directories(
+  external/glad/include/
+  external/glm/
+  external/
+  external/glfw/include/
+)
 
 add_library(glad STATIC external/glad/src/glad.c)
 
-# This defines the variables <X>_LIBRARIES that containts all library names
-# that we need to link into the program.
-find_package(glfw3 3.3 REQUIRED)
+# find_package(glfw3 3.3 REQUIRED)
 
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
