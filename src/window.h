@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <functional>
 
 #include <glad/glad.h>
@@ -16,12 +17,10 @@ class glfw_error: public std::runtime_error
 {
 public:
     glfw_error(int code, const std::string& glfw_info, const std::string& prefix = "")
-        : std::runtime_error((prefix.size() ? prefix : "glfw error") + ": #" + std::to_string(code)
+        : std::runtime_error((prefix.size() ? prefix : "glfw error") + std::string(": #") + std::to_string(code)
             + ", " + glfw_info)
         , m_code(code)
     {}
-
-    glfw_error() = default;
 
     int code() const { return m_code; }
     bool ok() const { return m_code == 0; }

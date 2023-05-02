@@ -28,7 +28,7 @@ ShaderProgram::ShaderProgram(const char* vert_shader_src, const char* frag_shade
     if (!success)
     {
         glGetShaderInfoLog(vert_shader, sizeof(info_log), NULL, info_log);
-        throw std::runtime_error(std::string("vertex shader compile failed:\n") + info_log);
+        throw std::runtime_error(std::string("vertex shader compile failed:\n") + std::string(info_log));
     }
 
     // Compile fragment shader and check for compilation errors
@@ -38,7 +38,7 @@ ShaderProgram::ShaderProgram(const char* vert_shader_src, const char* frag_shade
     if (!success)
     {
         glGetShaderInfoLog(frag_shader, sizeof(info_log), NULL, info_log);
-        throw std::runtime_error(std::string("vertex shader compile failed:\n") + info_log);
+        throw std::runtime_error(std::string("vertex shader compile failed:\n") + std::string(info_log));
     }
 
     // Create and link shader program, checking for linking errors
@@ -54,7 +54,7 @@ ShaderProgram::ShaderProgram(const char* vert_shader_src, const char* frag_shade
     if (!success)
     {
         glGetProgramInfoLog(m_handle, sizeof(info_log), NULL, info_log);
-        throw std::runtime_error(std::string("failed to link shader program:\n") + info_log);
+        throw std::runtime_error(std::string("failed to link shader program:\n") + std::string(info_log));
     }
 
     program_free.release();

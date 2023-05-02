@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0) # setting this is required
+cmake_minimum_required(VERSION 3.1) # setting this is required
 project(single_view_modeling)       # this sets the project name
 
 ###############################################################################
@@ -23,7 +23,7 @@ file(GLOB_RECURSE data resources/*)
 add_executable(single_view_modeling ${sources} ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(single_view_modeling PUBLIC -std=c++14 -Wall -Wextra -Weffc++ -Werror -g)
+target_compile_options(single_view_modeling PUBLIC -std=c++14 -Wall -Wextra -Weffc++ -g)
 
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(single_view_modeling PUBLIC src/main)
