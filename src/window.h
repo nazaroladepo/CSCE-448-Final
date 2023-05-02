@@ -41,6 +41,8 @@ public:
 
     void get_window_size(int& width, int& height);
 
+    bool key_is_pressed(int key);
+
     template <class CbFunc>
     void set_keyboard_callback(CbFunc&& cb)
     {

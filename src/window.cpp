@@ -99,6 +99,11 @@ void Window::get_window_size(int& width, int& height)
     glfwGetWindowSize(m_handle, &width, &height);
 }
 
+bool Window::key_is_pressed(int key)
+{
+    return glfwGetKey(m_handle, key) == GLFW_PRESS;
+}
+
 void Window::poll_events()
 {
     glfwPollEvents();

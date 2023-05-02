@@ -19,6 +19,8 @@ static constexpr const char* const DEFAULT_TITLE = "Single View Modeling";
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
+void process_keyboard_input(Window& window, Camera& camera);
+
 vertex3_element vertices[4] = 
 {
     // modelx,modely,modelz,  tex_u, tex_v
@@ -76,35 +78,13 @@ int main(int argc, const char* argv[])
     Camera camera;
     camera.z = 3;
     camera.set_screen(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    window.set_keyboard_callback([&camera](int key, int, int action, int)
-    {
-        constexpr float move_size = 0.05;
-        if (action != GLFW_PRESS) return;
-        switch (key)
-        {
-        case GLFW_KEY_W:
-            camera.move_forward(move_size);
-            break;
-        case GLFW_KEY_S:
-            camera.move_forward(-move_size);
-            break;
-        case GLFW_KEY_A:
-            camera.strafe_left(move_size);
-            break;
-        case GLFW_KEY_D:
-            camera.strafe_left(-move_size);
-            break;
-        default:
-            break;
-        };
-    });
     float last_cursor_x = 0.0;
     float last_cursor_y = 0.0;
     bool first_cursor_input = true;
     window.set_cursor_pos_callback(
         [&camera, &last_cursor_x, &last_cursor_y, &first_cursor_input](double x_pos, double y_pos)
     {
-        constexpr float sensitivity = 10.0;
+        constexpr float sensitivity = 0.1;
 
         if (first_cursor_input)
         {
@@ -116,8 +96,8 @@ int main(int argc, const char* argv[])
         const float offset_x = static_cast<float>(x_pos) - last_cursor_x;
         const float offset_y = static_cast<float>(y_pos) - last_cursor_y;
 
-        camera.yaw_left(offset_x / camera.screen_width * sensitivity);
-        camera.pitch_up(-offset_y / camera.screen_height * sensitivity);
+        camera.yaw_left(offset_x * sensitivity);
+        camera.pitch_up(-offset_y * sensitivity);
 
         last_cursor_x = x_pos;
         last_cursor_y = y_pos;
@@ -130,6 +110,8 @@ int main(int argc, const char* argv[])
     std::atexit([](){ glfwTerminate(); });
     while (!window.should_close())
     {
+        process_keyboard_input(window, camera);
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -145,4 +127,25 @@ int main(int argc, const char* argv[])
     }
 
     return 0;
+}
+
+void process_keyboard_input(Window& window, Camera& camera)
+{
+    constexpr float move_size = 0.05;
+    if (window.key_is_pressed(GLFW_KEY_W))
+    {
+        camera.move_forward(move_size);
+    }
+    if (window.key_is_pressed(GLFW_KEY_S))
+    {
+        camera.move_forward(-move_size);
+    }
+    if (window.key_is_pressed(GLFW_KEY_A))
+    {
+        camera.strafe_left(move_size);
+    }
+    if (window.key_is_pressed(GLFW_KEY_D))
+    {
+        camera.strafe_left(-move_size);
+    }
 }
