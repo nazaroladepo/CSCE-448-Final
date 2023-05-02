@@ -37,7 +37,7 @@ file(COPY ${data} DESTINATION resources)
 ###############################################################################
 
 set(CMAKE_OSX_ARCHITECTURES arm64)
-add_subdirectory(external/glfw external/glfw/build)
+add_subdirectory(external/glfw glfw_files)
 
 include_directories(
   external/glad/include/
