@@ -29,6 +29,7 @@ Texture2D Texture2D::from_memory(void*, size_t)
 Texture2D Texture2D::from_file(const char* image_path)
 {
     int width, height, num_channels;
+    stbi_set_flip_vertically_on_load(true); //flip loaded texture's on the y-axis.
     unsigned char *rgb_data = stbi_load(image_path, &width, &height, &num_channels, 0);
     if (!rgb_data)
     {
