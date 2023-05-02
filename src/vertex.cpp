@@ -35,7 +35,7 @@ VertexArrayBuffer::VertexArrayBuffer
     glEnableVertexAttribArray(0);
 }
 
-void VertexArrayBuffer::draw()
+void VertexArrayBuffer::draw_elements()
 {
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, 3 * m_num_triangles, GL_UNSIGNED_INT, NULL);

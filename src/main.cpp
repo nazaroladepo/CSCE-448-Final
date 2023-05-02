@@ -54,7 +54,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         program.use();
-        vao.draw();
+        vao.draw_elements();
 
         window.swap_buffers();
         Window::poll_events();

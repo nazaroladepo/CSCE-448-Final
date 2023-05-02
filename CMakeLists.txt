@@ -36,7 +36,7 @@ file(COPY ${data} DESTINATION resources)
 ## dependencies ###############################################################
 ###############################################################################
 
-include_directories(external/glad/include external/glm)
+include_directories(external/glad/include external/glm external/)
 
 add_library(glad STATIC external/glad/src/glad.c)
 

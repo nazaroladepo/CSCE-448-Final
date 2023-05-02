@@ -26,7 +26,7 @@ public:
     VertexArrayBuffer& operator=(const VertexArrayBuffer&) = delete;
     VertexArrayBuffer& operator=(VertexArrayBuffer&&) = delete;
 
-    void draw();
+    void draw_elements();
 
     ~VertexArrayBuffer();
 private:
