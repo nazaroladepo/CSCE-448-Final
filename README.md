@@ -2,8 +2,16 @@
 
 ## Dependencies
 
-The only dependency needed to compile and run this project is OpenGL 3.3, which should come
-supported by default with the drivers of any modern GPU.
+The only dependencies needed to compile and run this project is OpenGL 3.3, which should come
+supported by default with the drivers of any modern GPU, and CMake 3.1.
+
+## Ubuntu
+
+    apt install cmake
+
+## macOS
+
+    brew install cmake
 
 ## How to Build
 
@@ -11,16 +19,8 @@ supported by default with the drivers of any modern GPU.
 
     ./build.sh
 
-### Windows
-
-    TODO
-
 ## How to Run
 
 ### Linux and macOS
 
     ./build/single_view_modeling
-
-### Windows
-
-    TODO
