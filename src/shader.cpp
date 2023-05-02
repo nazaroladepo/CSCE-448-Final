@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <stdexcept>
+#include <string>
 
 #include "scope_guard.h"
 #include "shader.h"

@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include <stdexcept>
+#include <string>
 
 #include "scope_guard.h"
 #include "texture.h"

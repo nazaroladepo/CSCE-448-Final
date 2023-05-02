@@ -18,6 +18,8 @@ file(GLOB_RECURSE data resources/*)
 ## target definitions #########################################################
 ###############################################################################
 
+set(CMAKE_OSX_ARCHITECTURES arm64)
+
 # The data is just added to the executable, because in some IDEs (QtCreator) 
 # files are invisible when they are not explicitly part of the project.
 add_executable(single_view_modeling ${sources} ${data})
@@ -36,7 +38,6 @@ file(COPY ${data} DESTINATION resources)
 ## dependencies ###############################################################
 ###############################################################################
 
-set(CMAKE_OSX_ARCHITECTURES arm64)
 add_subdirectory(external/glfw glfw_files)
 
 include_directories(
@@ -93,30 +94,3 @@ if(GTEST_FOUND)
   )
   
 endif()
-
-###############################################################################
-## packaging ##################################################################
-###############################################################################
-
-# All install commands get the same destination. this allows us to use paths
-# relative to the executable.
-install(TARGETS single_view_modeling DESTINATION single_view_modeling_destination)
-
-# This is basically a repeat of the file copy instruction that copies the
-# resources in the build directory, but here we tell cmake that we want it
-# in the package.
-install(DIRECTORY resources DESTINATION single_view_modeling_destination)
-
-# Now comes everything we need, to create a package
-# there are a lot more variables you can set, and some
-# you need to set for some package types, but we want to
-# be minimal here.
-set(CPACK_PACKAGE_NAME "Single-View Modeling")
-set(CPACK_PACKAGE_VERSION "1.0.0")
-
-# We don't want to split our program up into several incomplete pieces.
-set(CPACK_MONOLITHIC_INSTALL 1)
-
-# This must be last
-include(CPack)
-
