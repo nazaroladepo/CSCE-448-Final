@@ -65,6 +65,8 @@ int main(int argc, const char* argv[])
     Texture2D texture = Texture2D::from_file(argv[1]);
     program.setUniformInt("ourTexture", 0);
 
+    glEnable(GL_DEPTH_TEST);
+
     while (!window.should_close())
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
