@@ -13,6 +13,8 @@ public:
 
     void use();
 
+    void setUniformInt(const char* uniform_name, GLint value);
+
     ~ShaderProgram();
 private:
     GLuint m_handle;

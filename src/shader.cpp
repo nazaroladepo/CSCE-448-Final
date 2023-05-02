@@ -66,6 +66,12 @@ void ShaderProgram::use()
     glUseProgram(m_handle);
 }
 
+void ShaderProgram::setUniformInt(const char* uniform_name, GLint value)
+{
+    use();
+    glUniform1i(glGetUniformLocation(m_handle, uniform_name), value);
+}
+
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(m_handle);

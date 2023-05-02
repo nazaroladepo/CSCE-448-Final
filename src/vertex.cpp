@@ -6,7 +6,7 @@ namespace vertex
 {
 VertexArrayBuffer::VertexArrayBuffer
 (
-    const vertex3* verts,
+    const vertex3_element* verts,
     GLsizei num_verts,
     const indexed_triangle* triangles,
     GLsizei num_triangles
@@ -25,14 +25,19 @@ VertexArrayBuffer::VertexArrayBuffer
     glBindVertexArray(m_vao);
     // 2. copy our vertices array in a vertex buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex3) * num_verts, verts, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex3_element) * num_verts, verts, GL_STATIC_DRAW);
     // 3. copy our index array in a element buffer for OpenGL to use
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexed_triangle) * num_triangles, triangles,
         GL_STATIC_DRAW);
-    // 4. then set the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex3), NULL);
+    // 4. then set the vertex attributes pointers for position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex3_element),
+        reinterpret_cast<void*>(offsetof(vertex3_element, xyz)));
     glEnableVertexAttribArray(0);
+    // 5. and for texture coords
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex3_element),
+        reinterpret_cast<void*>(offsetof(vertex3_element, texture_uv)));
+    glEnableVertexAttribArray(1);
 }
 
 void VertexArrayBuffer::draw_elements()

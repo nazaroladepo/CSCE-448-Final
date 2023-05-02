@@ -7,7 +7,12 @@ namespace svm
 {
 namespace vertex
 {
-using vertex3 = GLfloat[3];
+struct vertex3_element
+{
+    GLfloat xyz[3];
+    GLfloat texture_uv[2];
+};
+
 using indexed_triangle = GLuint[3];
 
 class VertexArrayBuffer
@@ -15,7 +20,7 @@ class VertexArrayBuffer
 public:
     VertexArrayBuffer
     (
-        const vertex3* verts,
+        const vertex3_element* verts,
         GLsizei num_verts,
         const indexed_triangle* triangles,
         GLsizei num_triangles
