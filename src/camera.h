@@ -8,7 +8,7 @@ namespace camera
 {
 struct Camera
 {
-    glm::mat4 get_view_proj() const;
+    glm::mat4 get_view_projection() const;
 
     glm::vec3 position() const;
     glm::vec3 direction() const;
@@ -28,9 +28,9 @@ struct Camera
     float y;
     float z;
     float pitch;
-    float yaw;
+    float yaw = -90.0;
     float aspect_ratio = 1.0;
-    float fovy_deg = 45.0;
+    float fovy = 45.0;
 };
 } // namespace camera
 } // namespace svm

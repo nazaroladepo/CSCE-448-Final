@@ -11,10 +11,12 @@ namespace svm
 {
 namespace camera
 {
-glm::mat4 Camera::get_view_proj() const
+glm::mat4 Camera::get_view_projection() const
 {
     const glm::vec3 pos = position();
-    return glm::lookAt(pos, pos + direction(), global_up);
+    const glm::mat4 view = glm::lookAt(pos, pos + direction(), global_up);
+    const glm::mat4 persp = glm::perspective(glm::radians(fovy), aspect_ratio, 0.1f, 100.0f);
+    return persp * view;
 }
 
 glm::vec3 Camera::position() const

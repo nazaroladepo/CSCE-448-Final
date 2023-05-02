@@ -25,7 +25,7 @@ set(CMAKE_OSX_ARCHITECTURES arm64)
 add_executable(single_view_modeling ${sources} ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(single_view_modeling PUBLIC -std=c++14 -Wall -Wextra -Weffc++ -g)
+target_compile_options(single_view_modeling PUBLIC -std=c++14 -Wall -Wextra -g)
 
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(single_view_modeling PUBLIC src/main)

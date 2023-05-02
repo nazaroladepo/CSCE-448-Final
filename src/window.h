@@ -32,16 +32,37 @@ private:
 class Window
 {
 public:
+    Window(int width, int height, const char* title);
+
     bool should_close();
     void notify_should_close();
+
     void swap_buffers();
+
+    void get_window_size(int& width, int& height);
+
+    template <class CbFunc>
+    void set_keyboard_callback(CbFunc&& cb)
+    {
+        m_key_cb = cb;
+    }
+
+    template <class CbFunc>
+    void set_mouse_callback(CbFunc&& cb)
+    {
+        m_mouse_cb = cb;
+    }
+
+    template <class CbFunc>
+    void set_resize_callback(CbFunc&& cb)
+    {
+        m_resize_cb = cb;
+    }
 
     Window(const Window&) = delete;
     Window(Window&&) = delete;
     Window& operator=(const Window&) = delete;
     Window& operator=(Window&&) = delete;
-
-    Window(int width, int height, const char* title);
 
     ~Window();
 
@@ -49,11 +70,13 @@ public:
 
 private:
     static void key_callback_outer(GLFWwindow*, int, int, int, int);
+    static void framebuffer_size_callback(GLFWwindow*, int, int);
 
     GLFWwindow* m_handle;
     // https://www.glfw.org/docs/latest/input_guide.html
     std::function<void(int, int, int, int)> m_key_cb;
     std::function<void(double, double)> m_mouse_cb;
+    std::function<void(int, int)> m_resize_cb;
 };
 }
 }

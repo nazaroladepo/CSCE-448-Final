@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/mat4x4.hpp>
 
 namespace svm
 {
@@ -14,6 +15,7 @@ public:
     void use();
 
     void setUniformInt(const char* uniform_name, GLint value);
+    void setUniformMat4(const char* uniform_name, const glm::mat4& value);
 
     ~ShaderProgram();
 private:

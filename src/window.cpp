@@ -35,11 +35,6 @@ void initialize_glfw_idempotent()
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     });
 }
-
-void framebuffer_size_callback(GLFWwindow*, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
 } // anonymous namespace
 
 namespace svm
@@ -51,8 +46,9 @@ thread_local std::string glfw_errmsg = "";
 
 Window::Window(int width, int height, const char* title)
     : m_handle(nullptr)
-    , m_key_cb([](int,int,int,int){})
-    , m_mouse_cb([](double,double){})
+    , m_key_cb()
+    , m_mouse_cb()
+    , m_resize_cb()
 {
     initialize_glfw_idempotent();
 
@@ -95,6 +91,11 @@ void Window::swap_buffers()
     glfwSwapBuffers(m_handle);
 }
 
+void Window::get_window_size(int& width, int& height)
+{
+    glfwGetWindowSize(m_handle, &width, &height);
+}
+
 void Window::poll_events()
 {
     glfwPollEvents();
@@ -107,9 +108,20 @@ void Window::key_callback_outer(GLFWwindow* window, int key, int scancode, int a
     {
         window_outer->notify_should_close();
     }
-    else
+    else if (window_outer->m_key_cb)
     {
         window_outer->m_key_cb(key, scancode, action, mods);
+    }
+}
+
+void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+
+    Window* window_outer = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (window_outer->m_resize_cb)
+    {
+        window_outer->m_resize_cb(width, height);
     }
 }
 } // namespace window

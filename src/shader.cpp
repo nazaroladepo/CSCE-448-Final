@@ -72,6 +72,12 @@ void ShaderProgram::setUniformInt(const char* uniform_name, GLint value)
     glUniform1i(glGetUniformLocation(m_handle, uniform_name), value);
 }
 
+void ShaderProgram::setUniformMat4(const char* uniform_name, const glm::mat4& value)
+{
+    use();
+    glUniformMatrix4fv(glGetUniformLocation(m_handle, uniform_name), 1, GL_FALSE, &value[0][0]);
+}
+
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(m_handle);
