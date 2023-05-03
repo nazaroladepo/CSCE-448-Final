@@ -29,12 +29,12 @@ Texture2D& Texture2D::operator=(Texture2D&& other)
     return *this;
 }
 
-int width() const
+int Texture2D::width() const
 {
     return static_cast<int>(m_width);
 }
 
-int height() const
+int Texture2D::height() const
 {
     return static_cast<int>(m_height);
 }
