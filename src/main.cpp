@@ -47,7 +47,7 @@ const char* vshader_src =
     "{\n"
     "    gl_Position = camera * vec4(aPos, 1.0);\n"
     "    TexCoord = aTexCoord;\n"
-    "};\n";
+    "}\n";
 
 const char* fshader_src =
     "#version 330 core\n"

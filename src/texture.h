@@ -15,6 +15,9 @@ public:
     Texture2D(Texture2D&&);
     Texture2D& operator=(Texture2D&&);
 
+    int width() const;
+    int height() const;
+
     void insert_to_unit_spot(GLenum texture_unit);
 
     ~Texture2D();

@@ -29,6 +29,16 @@ Texture2D& Texture2D::operator=(Texture2D&& other)
     return *this;
 }
 
+int width() const
+{
+    return static_cast<int>(m_width);
+}
+
+int height() const
+{
+    return static_cast<int>(m_height);
+}
+
 void Texture2D::insert_to_unit_spot(GLenum spot)
 {
     glActiveTexture(spot);
