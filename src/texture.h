@@ -9,6 +9,12 @@ namespace texture
 class Texture2D
 {
 public:
+    Texture2D(const Texture2D&) = delete;
+    Texture2D& operator=(const Texture2D&) = delete;
+
+    Texture2D(Texture2D&&);
+    Texture2D& operator=(Texture2D&&);
+
     void insert_to_unit_spot(GLenum texture_unit);
 
     ~Texture2D();

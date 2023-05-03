@@ -32,7 +32,7 @@ struct Camera
     float yaw = -90.0;
     float screen_width = 600.0;
     float screen_height = 400.0;
-    float fovy = 45.0;
+    float fovy = 54.0;
 };
 } // namespace camera
 } // namespace svm

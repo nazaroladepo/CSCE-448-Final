@@ -10,6 +10,25 @@ namespace svm
 {
 namespace texture
 {
+Texture2D::Texture2D(Texture2D&& other)
+    : m_handle(other.m_handle)
+    , m_width(other.m_width)
+    , m_height(other.m_height)
+    , m_num_chan(other.m_num_chan)
+{
+    other.m_handle = 0;
+}
+
+Texture2D& Texture2D::operator=(Texture2D&& other)
+{
+    m_handle = other.m_handle;
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_num_chan = other.m_num_chan;
+    other.m_handle = 0;
+    return *this;
+}
+
 void Texture2D::insert_to_unit_spot(GLenum spot)
 {
     glActiveTexture(spot);
@@ -18,7 +37,10 @@ void Texture2D::insert_to_unit_spot(GLenum spot)
 
 Texture2D::~Texture2D()
 {
-    glDeleteTextures(1, &m_handle);
+    if (m_handle != 0)
+    {
+        glDeleteTextures(1, &m_handle);
+    }
 }
 
 Texture2D Texture2D::from_memory(void*, size_t)
