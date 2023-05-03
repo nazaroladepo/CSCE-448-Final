@@ -74,8 +74,9 @@ int main(int argc, const char* argv[])
 
     VertexArrayBuffer vao(vertices, ARRAY_SIZE(vertices), triangles, ARRAY_SIZE(triangles));
     ShaderProgram program(vshader_src, fshader_src);
-    Texture2D texture = Texture2D::from_file(argv[1]);
     program.setUniformInt("ourTexture", 0);
+    Texture2D texture = Texture2D::from_file(argv[1]);
+    texture.insert_to_unit_spot(GL_TEXTURE0);
 
     Camera camera;
     camera.z = 3;
@@ -119,9 +120,6 @@ int main(int argc, const char* argv[])
 
         program.setUniformMat4("camera", camera.get_view_projection());
 
-        texture.insert_to_unit_spot(GL_TEXTURE0);
-
-        program.use();
         vao.draw_elements();
 
         window.swap_buffers();
