@@ -69,6 +69,8 @@ int main(int argc, const char* argv[])
 
     Window window(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     VertexArrayBuffer vao(vertices, ARRAY_SIZE(vertices), triangles, ARRAY_SIZE(triangles));
     ShaderProgram program(vshader_src, fshader_src);
