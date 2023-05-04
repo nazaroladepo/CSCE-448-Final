@@ -26,15 +26,21 @@ public:
         GLsizei num_triangles
     );
 
+    VertexArrayBuffer() = default;
+
     VertexArrayBuffer(const VertexArrayBuffer&) = delete;
-    VertexArrayBuffer(VertexArrayBuffer&&) = delete;
     VertexArrayBuffer& operator=(const VertexArrayBuffer&) = delete;
-    VertexArrayBuffer& operator=(VertexArrayBuffer&&) = delete;
+
+    VertexArrayBuffer(VertexArrayBuffer&&);
+    VertexArrayBuffer& operator=(VertexArrayBuffer&&);
 
     void draw_elements();
 
     ~VertexArrayBuffer();
+
 private:
+    void destroy();
+
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_ebo;

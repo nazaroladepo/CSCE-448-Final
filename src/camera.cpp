@@ -55,7 +55,7 @@ void Camera::move_forward(float d)
 void Camera::pitch_up(float deg)
 {
     pitch += deg;
-    pitch = glm::clamp(pitch, -90.0f, 90.0f);
+    pitch = glm::clamp(pitch, -80.0f, 80.0f);
 }
 
 void Camera::yaw_left(float deg)

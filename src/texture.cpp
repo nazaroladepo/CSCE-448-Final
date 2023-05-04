@@ -21,6 +21,11 @@ Texture2D::Texture2D(Texture2D&& other)
 
 Texture2D& Texture2D::operator=(Texture2D&& other)
 {
+    if (m_handle != 0)
+    {
+        glDeleteTextures(1, &m_handle);
+    }
+
     m_handle = other.m_handle;
     m_width = other.m_width;
     m_height = other.m_height;

@@ -40,6 +40,26 @@ VertexArrayBuffer::VertexArrayBuffer
     glEnableVertexAttribArray(1);
 }
 
+VertexArrayBuffer::VertexArrayBuffer(VertexArrayBuffer&& other)
+{
+    m_vao = other.m_vao;
+    m_vbo = other.m_vbo;
+    m_ebo = other.m_ebo;
+    m_num_triangles = other.m_num_triangles;
+    other.m_vao = 0;
+}
+
+VertexArrayBuffer& VertexArrayBuffer::operator=(VertexArrayBuffer&& other)
+{
+    destroy();
+    m_vao = other.m_vao;
+    m_vbo = other.m_vbo;
+    m_ebo = other.m_vbo;
+    m_num_triangles = other.m_num_triangles;
+    other.m_vao = 0;
+    return *this;
+}
+
 void VertexArrayBuffer::draw_elements()
 {
     glBindVertexArray(m_vao);
@@ -47,11 +67,20 @@ void VertexArrayBuffer::draw_elements()
     glBindVertexArray(0);
 }
 
+void VertexArrayBuffer::destroy()
+{
+    if (m_vao != 0)
+    {
+        glDeleteVertexArrays(1, &m_vao);
+        glDeleteBuffers(1, &m_ebo);
+        glDeleteBuffers(1, &m_vbo);
+        m_vao = 0;
+    }
+}
+
 VertexArrayBuffer::~VertexArrayBuffer()
 {
-    glDeleteVertexArrays(1, &m_vao);
-    glDeleteBuffers(1, &m_ebo);
-    glDeleteBuffers(1, &m_vbo);
+    destroy();
 }
 } // namespace window
 } // namespace svm
