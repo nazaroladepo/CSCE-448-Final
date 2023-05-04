@@ -36,16 +36,25 @@ int main(int argc, const char* argv[])
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     std::shared_ptr<Texture2D> texture(Texture2D::from_file(argv[1]));
-    Background bg(texture, glm::vec2(0.25, 0.75), glm::vec2(0.75, 0.25),
-        glm::vec2(0.5, 0.5), 54);
-    bg.setup(window);
+    Mesh mesh(texture);
+    Background bg(texture);/*, glm::vec2(0.25, 0.75), glm::vec2(0.75, 0.25),
+        glm::vec2(0.5, 0.5), 54);*/
+    //bg.setup(window);
 
-    Scene* scene = &bg;
+    Scene* scene = &mesh;
+    scene->setup(window);
 
     std::atexit([](){ glfwTerminate(); });
     while (!window->should_close())
     {
         scene->process_input(window, 1);
+        if (scene == &mesh && mesh.should_switch_scenes())
+        {
+            scene = &bg;
+            bg.set_user_params(mesh.top_left, mesh.bot_right, mesh.vanishing, 54.0f);
+            scene->setup(window);
+            continue;
+        }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

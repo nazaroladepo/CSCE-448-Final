@@ -65,7 +65,7 @@ const char* dot_fshader_src =
     "uniform float dot_rad;\n"
     "void main()\n"
     "{\n"
-    "    float dist = sqrt(dot(dot_pos_rel,dot_pos-rel));\n"
+    "    float dist = sqrt(dot(dot_pos_rel,dot_pos_rel));\n"
     "    if (dist >= dot_rad) {\n"
     "        discard;\n"
     "    }\n"

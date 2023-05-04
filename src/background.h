@@ -14,15 +14,16 @@ namespace background
 class Background: public scene::Scene
 {
 public:
-    Background
+    Background(std::shared_ptr<texture::Texture2D> bg);
+
+    void set_user_params
     (
-        std::shared_ptr<texture::Texture2D> bg,
         const glm::vec2& top_left,
         const glm::vec2& bot_right,
         const glm::vec2& vanishing,
         float fovy
     );
- 
+
     void setup(const window_ptr_t& window) override;
     void process_input(const window_ptr_t& window, float frame_time) override;
     void render(const window_ptr_t& window, float frame_time) override;

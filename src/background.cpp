@@ -17,14 +17,7 @@ namespace svm
 {
 namespace background
 {
-Background::Background
-(
-    std::shared_ptr<texture::Texture2D> bg,
-    const glm::vec2& top_left,
-    const glm::vec2& bot_right,
-    const glm::vec2& vanishing,
-    float fovy
-)
+Background::Background(std::shared_ptr<texture::Texture2D> bg)
     : m_camera()
     , m_prog(shader::ShaderProgram::textured_object())
     , m_texture(bg)
@@ -32,11 +25,19 @@ Background::Background
     , m_last_cursor_x()
     , m_last_cursor_y()
     , m_first_cursor_input(true)
+{}
+
+void Background::set_user_params
+(
+    const glm::vec2& top_left,
+    const glm::vec2& bot_right,
+    const glm::vec2& vanishing,
+    float fovy
+)
 {
     m_camera.pitch = 0;
     m_camera.yaw = -90.0;
     m_camera.fovy = fovy;
-    std::cout << fovy << std::endl;
 
     vertex::vertex3_element verts[12];
     calculate_tex_2d(top_left, bot_right, vanishing, fovy, verts);
@@ -69,7 +70,7 @@ Background::Background
         }
     }
 
-    m_vao = vertex::VertexArrayBuffer(verts, 12, triangles, 10);
+    m_vao = vertex::VertexArrayBuffer(verts, ARRAY_SIZE(verts), triangles, ARRAY_SIZE(triangles));
 }
 
 void Background::setup(const window_ptr_t& window)
