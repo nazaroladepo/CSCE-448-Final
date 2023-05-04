@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <glad/glad.h>
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 namespace svm
 {
 namespace vertex

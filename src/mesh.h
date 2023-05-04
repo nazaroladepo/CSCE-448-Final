@@ -6,14 +6,10 @@
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
-//#include "window.h"
+#include "window.h"
 
 namespace svm
 {
-namespace window
-{
-class Window;
-}
 namespace mesh
 {
 class Mesh

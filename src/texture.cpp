@@ -58,12 +58,12 @@ Texture2D::~Texture2D()
     }
 }
 
-Texture2D Texture2D::from_memory(void*, size_t)
+Texture2D* Texture2D::from_memory(void*, size_t)
 {
     throw std::logic_error("not implemented");
 }
 
-Texture2D Texture2D::from_file(const char* image_path)
+Texture2D* Texture2D::from_file(const char* image_path)
 {
     int width, height, num_channels;
     stbi_set_flip_vertically_on_load(true); //flip loaded texture's on the y-axis.
@@ -77,7 +77,7 @@ Texture2D Texture2D::from_file(const char* image_path)
         stbi_image_free(rgb_data);   
         throw std::runtime_error("unexpected number of channels: " + std::to_string(num_channels));
     }
-    return Texture2D(rgb_data, width, height, num_channels);
+    return new Texture2D(rgb_data, width, height, num_channels);
 }
 
 Texture2D::Texture2D(unsigned char* rgb_data, GLsizei width, GLsizei height, GLsizei num_channels)

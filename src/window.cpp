@@ -129,7 +129,7 @@ void Window::set_cursor_enabled(bool enabled)
 bool Window::is_cursor_pressed(bool left)
 {
     const int button = left ? GLFW_MOUSE_BUTTON_LEFT : GLFW_MOUSE_BUTTON_RIGHT;
-    return GLFW_PRESS == glfwGetMouseButton(m_handle, GLFW_MOUSE_BUTTON_LEFT);
+    return GLFW_PRESS == glfwGetMouseButton(m_handle, button);
 }
 
 void Window::get_cursor_pos(double& xpos, double& ypos)

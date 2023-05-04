@@ -1,3 +1,4 @@
+#include <iostream>
 #include <utility>
 
 #include "background.h"
@@ -18,19 +19,24 @@ namespace background
 {
 Background::Background
 (
-    texture::Texture2D&& bg,
+    std::shared_ptr<texture::Texture2D> bg,
     const glm::vec2& top_left,
     const glm::vec2& bot_right,
     const glm::vec2& vanishing,
     float fovy
 )
-    : m_prog(shader::ShaderProgram::textured_object())
-    , m_texture(std::forward<texture::Texture2D>(bg))
+    : m_camera()
+    , m_prog(shader::ShaderProgram::textured_object())
+    , m_texture(bg)
     , m_vao()
-    , m_start_pos(0, 0, 3)
-    , m_start_fov(fovy)
+    , m_last_cursor_x()
+    , m_last_cursor_y()
+    , m_first_cursor_input(true)
 {
-
+    m_camera.pitch = 0;
+    m_camera.yaw = -90.0;
+    m_camera.fovy = fovy;
+    std::cout << fovy << std::endl;
 
     vertex::vertex3_element verts[12];
     calculate_tex_2d(top_left, bot_right, vanishing, fovy, verts);
@@ -66,23 +72,67 @@ Background::Background
     m_vao = vertex::VertexArrayBuffer(verts, 12, triangles, 10);
 }
 
-void Background::render(const glm::mat4& view_proj)
+void Background::setup(const window_ptr_t& window)
 {
-    m_prog.use();
-    m_prog.setUniformMat4("camera", view_proj);
-    m_texture.insert_to_unit_spot(GL_TEXTURE0);
-    m_vao.draw_elements();
+    int win_width, win_height;
+    window->get_window_size(win_width, win_height);
+    m_camera.set_screen(win_width, win_height);
+
+    window->set_cursor_enabled(false);
+    window->set_resize_callback([this](int width, int height)
+    {
+        m_camera.set_screen(width, height);
+    });
+    window->set_cursor_pos_callback(
+        [this](double x_pos, double y_pos)
+    {
+        constexpr float sensitivity = 0.1;
+
+        if (m_first_cursor_input)
+        {
+            m_last_cursor_x = static_cast<float>(x_pos);
+            m_last_cursor_y = static_cast<float>(y_pos);
+            m_first_cursor_input = false;
+        }
+
+        const float offset_x = static_cast<float>(x_pos) - m_last_cursor_x;
+        const float offset_y = static_cast<float>(y_pos) - m_last_cursor_y;
+
+        m_camera.yaw_left(offset_x * sensitivity);
+        m_camera.pitch_up(-offset_y * sensitivity);
+
+        m_last_cursor_x = x_pos;
+        m_last_cursor_y = y_pos;
+    });
 }
 
-void Background::setup(camera::Camera& camera, window::Window& window)
+void Background::process_input(const window_ptr_t& window, float frame_time)
 {
-    camera.x = m_start_pos.x;
-    camera.y = m_start_pos.y;
-    camera.z = m_start_pos.z;
-    camera.pitch = 0;
-    camera.yaw = -90.0;
-    camera.fovy = m_start_fov;
-    window.set_cursor_enabled(false);
+    constexpr float move_size = 0.05;
+    if (window->key_is_pressed(GLFW_KEY_W))
+    {
+        m_camera.move_forward(move_size);
+    }
+    if (window->key_is_pressed(GLFW_KEY_S))
+    {
+        m_camera.move_forward(-move_size);
+    }
+    if (window->key_is_pressed(GLFW_KEY_A))
+    {
+        m_camera.strafe_left(move_size);
+    }
+    if (window->key_is_pressed(GLFW_KEY_D))
+    {
+        m_camera.strafe_left(-move_size);
+    }
+}
+
+void Background::render(const window_ptr_t& window, float frame_time)
+{
+    m_prog.use();
+    m_prog.setUniformMat4("camera", m_camera.get_view_projection());
+    m_texture->insert_to_unit_spot(GL_TEXTURE0);
+    m_vao.draw_elements();
 }
 
 void Background::calculate_tex_2d
@@ -141,8 +191,8 @@ void Background::calculate_box_3d
     vertex::vertex3_element box_coords[12]
 )
 {
-    const float tex_width = m_texture.width();
-    const float tex_height = m_texture.height();
+    const float tex_width = m_texture->width();
+    const float tex_height = m_texture->height();
     const glm::vec2 tex_dimensions(tex_width, tex_height);
     const glm::vec2 tl = comp_mul(top_left, tex_dimensions);
     const glm::vec2 br = comp_mul(bot_right, tex_dimensions);
@@ -199,6 +249,10 @@ void Background::calculate_box_3d
     box_coords[11].xyz[0] = rear_w;
     box_coords[11].xyz[1] = REAR_H;
     box_coords[11].xyz[2] = box_depth;
+
+    m_camera.x = 0; // ...
+    m_camera.y = 0; // ...
+    m_camera.z = 3; // ...
 }
 } // namespace background
 } // namespace svm
