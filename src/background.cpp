@@ -74,7 +74,7 @@ void Background::render(const glm::mat4& view_proj)
     m_vao.draw_elements();
 }
 
-void Background::orient_camera_initially(camera::Camera& camera)
+void Background::setup(camera::Camera& camera, window::Window& window)
 {
     camera.x = m_start_pos.x;
     camera.y = m_start_pos.y;
@@ -82,6 +82,7 @@ void Background::orient_camera_initially(camera::Camera& camera)
     camera.pitch = 0;
     camera.yaw = -90.0;
     camera.fovy = m_start_fov;
+    window.set_cursor_enabled(false);
 }
 
 void Background::calculate_tex_2d

@@ -58,7 +58,7 @@ int main(int argc, const char* argv[])
 
     Camera camera;
     camera.set_screen(texture.width(), texture.height());
-    scene.orient_camera_initially(camera);
+    scene.setup(camera, window);
     float last_cursor_x = 0.0;
     float last_cursor_y = 0.0;
     bool first_cursor_input = true;

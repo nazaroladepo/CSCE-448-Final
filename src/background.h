@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
+#include "window.h"
 
 namespace svm
 {
@@ -21,7 +22,7 @@ public:
         float fovy
     );
  
-    void orient_camera_initially(camera::Camera& camera);
+    void setup(camera::Camera& camera, window::Window& window);
 
     void render(const glm::mat4& view_proj);
 
