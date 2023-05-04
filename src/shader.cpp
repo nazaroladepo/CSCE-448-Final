@@ -139,30 +139,31 @@ void ShaderProgram::use()
 void ShaderProgram::setUniformInt(const char* uniform_name, GLint value)
 {
     use();
-    glUniform1i(glGetUniformLocation(m_handle, uniform_name), value);
+    glUniform1i(get_uniform_loc(uniform_name), value);
 }
 
 void ShaderProgram::setUniformFloat(const char* uniform_name, GLfloat value)
 {
-    glUniform1f(glGetUniformLocation(m_handle, uniform_name), value);
+    use();
+    glUniform1f(get_uniform_loc(uniform_name), value);
 }
 
 void ShaderProgram::setUniformVec3(const char* uniform_name, const glm::vec3& value)
 {
     use();
-    glUniform3fv(glGetUniformLocation(m_handle, uniform_name), 1, &value[0]);
+    glUniform3fv(get_uniform_loc(uniform_name), 1, &value[0]);
 }
 
 void ShaderProgram::setUniformVec4(const char* uniform_name, const glm::vec4& value)
 {
     use();
-    glUniform4fv(glGetUniformLocation(m_handle, uniform_name), 1, &value[0]);
+    glUniform4fv(get_uniform_loc(uniform_name), 1, &value[0]);
 }
 
 void ShaderProgram::setUniformMat4(const char* uniform_name, const glm::mat4& value)
 {
     use();
-    glUniformMatrix4fv(glGetUniformLocation(m_handle, uniform_name), 1, GL_FALSE, &value[0][0]);
+    glUniformMatrix4fv(get_uniform_loc(uniform_name), 1, GL_FALSE, &value[0][0]);
 }
 
 ShaderProgram::~ShaderProgram()
@@ -191,6 +192,16 @@ ShaderProgram ShaderProgram::gui_dot(const glm::vec3& rgb, float radius)
     prog.setUniformVec3("flat_color", rgb);
     prog.setUniformFloat("dot_rad", radius);
     return prog;
+}
+
+GLint ShaderProgram::get_uniform_loc(const GLchar* name)
+{
+    const GLint res = glGetUniformLocation(m_handle, name);
+    if (res == -1)
+    {
+        throw std::runtime_error("uniform name '" + std::string(name) + "' not found in shader");
+    }
+    return res;
 }
 } // namespace shader
 } // namespace svm

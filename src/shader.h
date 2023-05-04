@@ -25,7 +25,10 @@ public:
     static ShaderProgram textured_object();
     static ShaderProgram flat_color(const glm::vec4& rgba);
     static ShaderProgram gui_dot(const glm::vec3& rgb, float radius);
+
 private:
+    GLint get_uniform_loc(const GLchar* name);
+
     GLuint m_handle;
 };
 } // namespace shader
