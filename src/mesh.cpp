@@ -1,13 +1,15 @@
+#include <iostream>
+
 #include "mesh.h"
 #include "window.h"
 
 namespace
 {
     static constexpr const int UP = 0;
-    static constexpr const int DOWN = 0;
-    static constexpr const int LEFT = 0;
-    static constexpr const int RIGHT = 0;
-    static constexpr const int VANISHING = 0;
+    static constexpr const int DOWN = 1;
+    static constexpr const int LEFT = 2;
+    static constexpr const int RIGHT = 3;
+    static constexpr const int VANISHING = 4;
 
     static constexpr const double VANISHING_DRAG_RADIUS = 15.0;
 
@@ -81,6 +83,10 @@ void Mesh::setup(const window_ptr_t& window)
     top_left = glm::vec2(win_width * 0.25, win_height * 0.25);
     bot_right = glm::vec2(win_width * 0.75, win_height * 0.75);
     vanishing = glm::vec2(win_width * 0.5, win_height * 0.5);
+
+    std::cout << "top_left " << top_left.x << ' ' << top_left.y << std::endl;
+    std::cout << "bot_right " << bot_right.x << ' ' << bot_right.y << std::endl;
+    std::cout << "vanishing " << vanishing.x << ' ' << vanishing.y << std::endl;
 }
 
 void Mesh::process_input(const window_ptr_t& window, float)
@@ -99,6 +105,7 @@ void Mesh::process_input(const window_ptr_t& window, float)
     {
         double cursor_x, cursor_y;
         window->get_cursor_pos(cursor_x, cursor_y);
+        std::cout << "(" << cursor_x << ", " << cursor_y << ")" << std::endl;
 
         if (m_dragging_edge == VANISHING)
         {
@@ -134,7 +141,10 @@ void Mesh::process_input(const window_ptr_t& window, float)
                 m_dragging_edge = LEFT;
             } else if (cursor_x > bot_right.x) {
                 m_dragging_edge = RIGHT;
+            } else {
+                 m_dragging_edge = -1;
             }
+            std::cout << "Began dragging " << m_dragging_edge << std::endl;
         }
 
         if (bot_right.y < top_left.y)
@@ -165,6 +175,7 @@ void Mesh::process_input(const window_ptr_t& window, float)
     }
     else
     {
+        //std::cout << "Stopped dragging" << std::endl;
         m_dragging_edge = -1;
     }
 }
