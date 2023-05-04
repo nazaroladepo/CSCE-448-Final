@@ -6,28 +6,6 @@ namespace
 {
 constexpr float REAR_H = 20; // arbitrary
 
-const char* vshader_src =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec2 aTexCoord;\n"
-    "out vec2 TexCoord;\n"
-    "uniform mat4 camera;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = camera * vec4(aPos, 1.0);\n"
-    "    TexCoord = aTexCoord;\n"
-    "}\n";
-
-const char* fshader_src =
-    "#version 330 core\n"
-    "in vec2 TexCoord;\n"
-    "out vec4 FragColor;\n"
-    "uniform sampler2D ourTexture;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = texture(ourTexture, TexCoord);\n"
-    "}\n";
-
 glm::vec2 comp_mul(const glm::vec2& a, const glm::vec2& b)
 {
     return glm::vec2(a.x * b.x, a.y * b.y);
@@ -46,7 +24,7 @@ Background::Background
     const glm::vec2& vanishing,
     float fovy
 )
-    : m_prog(vshader_src, fshader_src)
+    : m_prog(shader::ShaderProgram::textured_object())
     , m_texture(std::forward<texture::Texture2D>(bg))
     , m_vao()
     , m_start_pos(0, 0, 3)

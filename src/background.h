@@ -20,7 +20,7 @@ public:
         const glm::vec2& vanishing,
         float fovy
     );
-
+ 
     void orient_camera_initially(camera::Camera& camera);
 
     void render(const glm::mat4& view_proj);

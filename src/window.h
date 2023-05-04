@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <string>
 #include <functional>
 
@@ -40,8 +41,15 @@ public:
     void swap_buffers();
 
     void get_window_size(int& width, int& height);
+    void set_window_size(int width, int height);
+    void enforce_aspect_ratio(int num, int denom);
+    void screen_2_gl(double screen_x, double screen_y, float& gl_x, float& gl_y);
 
     bool key_is_pressed(int key);
+
+    void set_cursor_enabled(bool enabled);
+    bool is_cursor_pressed(bool left = true);
+    void get_cursor_pos(double& xpos, double& ypos);
 
     template <class CbFunc>
     void set_keyboard_callback(CbFunc&& cb)

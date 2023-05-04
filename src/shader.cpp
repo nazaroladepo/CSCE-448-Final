@@ -5,6 +5,75 @@
 #include "scope_guard.h"
 #include "shader.h"
 
+namespace
+{
+const char* textured_obj_vshader_src =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec2 aTexCoord;\n"
+    "out vec2 TexCoord;\n"
+    "uniform mat4 camera;\n"
+    "void main()\n"
+    "{\n"
+    "    gl_Position = camera * vec4(aPos, 1.0);\n"
+    "    TexCoord = aTexCoord;\n"
+    "}\n";
+
+const char* textured_obj_fshader_src =
+    "#version 330 core\n"
+    "in vec2 TexCoord;\n"
+    "out vec4 FragColor;\n"
+    "uniform sampler2D tex;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = texture(tex, TexCoord);\n"
+    "}\n";
+
+const char* flat_color_vshader_src =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "    gl_Position = vec4(aPos, 1.0);\n"
+    "}\n";
+
+const char* flat_color_fshader_src =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "uniform vec4 flat_color;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = flat_color;\n"
+    "}\n";
+
+const char* dot_vshader_src =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "out vec3 dot_pos_rel;\n"
+    "uniform vec3 dot_center;\n"
+    "void main()\n"
+    "{\n"
+    "    dot_pos_rel = aPos;\n"
+    "    gl_Position = vec4(aPos + dot_center, 1.0);\n"
+    "}\n";
+
+const char* dot_fshader_src =
+    "#version 330 core\n"
+    "in vec3 dot_pos_rel;\n"
+    "out vec4 FragColor;\n"
+    "uniform vec3 flat_color;\n"
+    "uniform float dot_rad;\n"
+    "void main()\n"
+    "{\n"
+    "    float dist = sqrt(dot(dot_pos_rel,dot_pos-rel));\n"
+    "    if (dist >= dot_rad) {\n"
+    "        discard;\n"
+    "    }\n"
+    "float sm = smoothstep(dot_rad,dot_rad-0.01,dist);\n"
+    "gl_FragColor = vec4(flat_color, sm);\n"
+    "}\n";
+} // anonymous namespace
+
 namespace svm
 {
 namespace shader
@@ -72,6 +141,23 @@ void ShaderProgram::setUniformInt(const char* uniform_name, GLint value)
     glUniform1i(glGetUniformLocation(m_handle, uniform_name), value);
 }
 
+void ShaderProgram::setUniformFloat(const char* uniform_name, GLfloat value)
+{
+    glUniform1f(glGetUniformLocation(m_handle, uniform_name), value);
+}
+
+void ShaderProgram::setUniformVec3(const char* uniform_name, const glm::vec3& value)
+{
+    use();
+    glUniform3fv(glGetUniformLocation(m_handle, uniform_name), 1, &value[0]);
+}
+
+void ShaderProgram::setUniformVec4(const char* uniform_name, const glm::vec4& value)
+{
+    use();
+    glUniform4fv(glGetUniformLocation(m_handle, uniform_name), 1, &value[0]);
+}
+
 void ShaderProgram::setUniformMat4(const char* uniform_name, const glm::mat4& value)
 {
     use();
@@ -81,6 +167,29 @@ void ShaderProgram::setUniformMat4(const char* uniform_name, const glm::mat4& va
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(m_handle);
+}
+
+ShaderProgram ShaderProgram::textured_object()
+{
+    ShaderProgram prog(textured_obj_vshader_src, textured_obj_fshader_src);
+    prog.setUniformMat4("camera", glm::mat4(1.0f));
+    prog.setUniformInt("tex", 0);
+    return prog;
+}
+
+ShaderProgram ShaderProgram::flat_color(const glm::vec4& rgba)
+{
+    ShaderProgram prog(flat_color_vshader_src, flat_color_fshader_src);
+    prog.setUniformVec4("flat_color", rgba);
+    return prog;
+}
+
+ShaderProgram ShaderProgram::gui_dot(const glm::vec3& rgb, float radius)
+{
+    ShaderProgram prog(dot_vshader_src, dot_fshader_src);
+    prog.setUniformVec3("flat_color", rgb);
+    prog.setUniformFloat("dot_rad", radius);
+    return prog;
 }
 } // namespace shader
 } // namespace svm

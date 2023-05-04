@@ -66,8 +66,6 @@ Window::Window(int width, int height, const char* title)
 
     glViewport(0, 0, width, height);
 
-    glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     glfwSetKeyCallback(m_handle, key_callback_outer);
     glfwSetCursorPosCallback(m_handle, cursor_pos_callback);
     glfwSetFramebufferSizeCallback(m_handle, framebuffer_size_callback);
@@ -99,9 +97,44 @@ void Window::get_window_size(int& width, int& height)
     glfwGetWindowSize(m_handle, &width, &height);
 }
 
+void Window::set_window_size(int width, int height)
+{
+    glfwSetWindowSize(m_handle, width, height);
+}
+
+void Window::enforce_aspect_ratio(int num, int denom)
+{
+    glfwSetWindowAspectRatio(m_handle, num, denom);
+}
+
+void Window::screen_2_gl(double screen_x, double screen_y, float& gl_x, float& gl_y)
+{
+    int width, height;
+    get_window_size(width, height);
+    gl_x = static_cast<float>(screen_x) / static_cast<float>(width);
+    gl_y = 1.0f - static_cast<float>(screen_y) / static_cast<float>(height);
+}
+
 bool Window::key_is_pressed(int key)
 {
     return glfwGetKey(m_handle, key) == GLFW_PRESS;
+}
+
+void Window::set_cursor_enabled(bool enabled)
+{
+    const int mode = enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED;
+    glfwSetInputMode(m_handle, GLFW_CURSOR, mode);
+}
+
+bool Window::is_cursor_pressed(bool left)
+{
+    const int button = left ? GLFW_MOUSE_BUTTON_LEFT : GLFW_MOUSE_BUTTON_RIGHT;
+    return GLFW_PRESS == glfwGetMouseButton(m_handle, GLFW_MOUSE_BUTTON_LEFT);
+}
+
+void Window::get_cursor_pos(double& xpos, double& ypos)
+{
+    glfwGetCursorPos(m_handle, &xpos, &ypos);
 }
 
 void Window::poll_events()
