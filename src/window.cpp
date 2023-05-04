@@ -111,8 +111,8 @@ void Window::screen_2_gl(double screen_x, double screen_y, float& gl_x, float& g
 {
     int width, height;
     get_window_size(width, height);
-    gl_x = static_cast<float>(screen_x) / static_cast<float>(width);
-    gl_y = 1.0f - static_cast<float>(screen_y) / static_cast<float>(height);
+    gl_x = static_cast<float>(screen_x) / static_cast<float>(width) * 2.0f - 1.0f;
+    gl_y = (1.0f - static_cast<float>(screen_y) / static_cast<float>(height)) * 2.0f - 1.0f;
 }
 
 bool Window::key_is_pressed(int key)

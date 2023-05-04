@@ -69,8 +69,9 @@ const char* dot_fshader_src =
     "    if (dist >= dot_rad) {\n"
     "        discard;\n"
     "    }\n"
-    "float sm = smoothstep(dot_rad,dot_rad-0.01,dist);\n"
-    "gl_FragColor = vec4(flat_color, sm);\n"
+    "    float sm = smoothstep(0, dot_rad, dist);\n"
+    "    sm = sm * sm;\n"
+    "    gl_FragColor = vec4(flat_color, 1 - sm);\n"
     "}\n";
 } // anonymous namespace
 

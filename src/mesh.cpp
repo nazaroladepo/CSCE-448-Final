@@ -13,17 +13,17 @@ namespace
 
     static constexpr const double VANISHING_DRAG_RADIUS = 15.0;
 
-    static constexpr const float DOT_Z = -0.01f;
+    static constexpr const float DOT_Z = -0.03f;
     static constexpr const float MESH_Z = -0.02f;
-    static constexpr const float TEX_Z = -0.03f;
+    static constexpr const float TEX_Z = -0.01f;
 
-    static constexpr const float DOT_RADIUS = 0.005f;
+    static constexpr const float DOT_RADIUS = 0.025f;
     svm::vertex::vertex3_element dot_verts[4] =
     {
-        { { -DOT_RADIUS, -DOT_RADIUS, DOT_Z }, {} },
-        { {  DOT_RADIUS, -DOT_RADIUS, DOT_Z }, {} },
-        { {  DOT_RADIUS,  DOT_RADIUS, DOT_Z }, {} },
-        { { -DOT_RADIUS,  DOT_RADIUS, DOT_Z }, {} }
+        { { -DOT_RADIUS, -DOT_RADIUS, 0.0 }, {} },
+        { {  DOT_RADIUS, -DOT_RADIUS, 0.0 }, {} },
+        { {  DOT_RADIUS,  DOT_RADIUS, 0.0 }, {} },
+        { { -DOT_RADIUS,  DOT_RADIUS, 0.0 }, {} }
     };
 
     svm::vertex::indexed_triangle quad_tris[2] =
@@ -48,6 +48,13 @@ namespace
         float gl_x, gl_y;
         window->screen_2_gl(screen.x, screen.y, gl_x, gl_y);
         return glm::vec2(gl_x, gl_y);
+    }
+
+    template <class OutputStream>
+    OutputStream& operator<<(OutputStream& os, const glm::vec3& v3)
+    {
+        os << "<" << v3.x << ", " << v3.y << ", " << v3.z << ">";
+        return os;
     }
 }
 
@@ -121,11 +128,11 @@ void Mesh::process_input(const window_ptr_t& window, float)
         }
         else if (m_dragging_edge == LEFT)
         {
-            top_left.y = cursor_x;
+            top_left.x = cursor_x;
         }
         else if (m_dragging_edge == RIGHT)
         {
-            bot_right.y = cursor_x;
+            bot_right.x = cursor_x;
         }
         else if (m_dragging_edge == -1)
         {
@@ -142,7 +149,7 @@ void Mesh::process_input(const window_ptr_t& window, float)
             } else if (cursor_x > bot_right.x) {
                 m_dragging_edge = RIGHT;
             } else {
-                 m_dragging_edge = -1;
+                m_dragging_edge = -1;
             }
             std::cout << "Began dragging " << m_dragging_edge << std::endl;
         }
@@ -192,23 +199,36 @@ void Mesh::render(const window_ptr_t& window, float)
     static constexpr const glm::vec3 REAR_DOTS_COLOR = glm::vec3(1.0f, 0.0f, 0.0f);
     static constexpr const glm::vec3 VANISHING_COLOR = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    const glm::vec2 bot_left = glm::vec2(top_left.x, bot_right.y);
-    const glm::vec2 top_right = glm::vec2(bot_right.x, top_left.y);
-    m_dot_prog.setUniformVec3("dot_center", glm::vec3(screen_2_gl(window, top_left), 0));
+    const auto screen_2_gl3 = [&window](const glm::vec2& v)
+    {
+        return glm::vec3(screen_2_gl(window, v), DOT_Z);
+    };
+
+    const glm::vec3 top_left_gl = screen_2_gl3(top_left);
+    const glm::vec3 bot_right_gl = screen_2_gl3(bot_right);
+    const glm::vec3 bot_left_gl = screen_2_gl3(glm::vec2(top_left.x, bot_right.y));
+    const glm::vec3 top_right_gl = screen_2_gl3(glm::vec2(bot_right.x, top_left.y));
+    const glm::vec3 vanishing_gl = screen_2_gl3(vanishing);
+
+    /*std::cout << "dots:" << std::endl;
+    std::cout << top_left_gl << std::endl;
+    std::cout << bot_right_gl << std::endl;
+    std::cout << bot_left_gl << std::endl;
+    std::cout << top_right_gl << std::endl;
+    std::cout << vanishing_gl << std::endl;*/
+
     m_dot_prog.setUniformVec3("flat_color", REAR_DOTS_COLOR);
+    m_dot_prog.setUniformVec3("dot_center", top_left_gl);
     m_dot_vao.draw_elements();
-    m_dot_prog.setUniformVec3("dot_center", glm::vec3(screen_2_gl(window, top_right), 0));
-    m_dot_prog.setUniformVec3("flat_color", REAR_DOTS_COLOR);
+    m_dot_prog.setUniformVec3("dot_center", bot_right_gl);
     m_dot_vao.draw_elements();
-    m_dot_prog.setUniformVec3("dot_center", glm::vec3(screen_2_gl(window, bot_right), 0));
-    m_dot_prog.setUniformVec3("flat_color", REAR_DOTS_COLOR);
+    m_dot_prog.setUniformVec3("dot_center", bot_left_gl);
     m_dot_vao.draw_elements();
-    m_dot_prog.setUniformVec3("dot_center", glm::vec3(screen_2_gl(window, bot_left), 0));
-    m_dot_prog.setUniformVec3("flat_color", REAR_DOTS_COLOR);
+    m_dot_prog.setUniformVec3("dot_center", top_right_gl);
     m_dot_vao.draw_elements();
 
-    m_dot_prog.setUniformVec3("dot_center", glm::vec3(screen_2_gl(window, vanishing), 0));
     m_dot_prog.setUniformVec3("flat_color", VANISHING_COLOR);
+    m_dot_prog.setUniformVec3("dot_center", vanishing_gl);
     m_dot_vao.draw_elements();
 }
 
