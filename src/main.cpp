@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "background.h"
 #include "camera.h"
 #include "shader.h"
 #include "texture.h"
@@ -7,6 +8,7 @@
 #include "window.h"
 
 using namespace svm;
+using namespace svm::background;
 using namespace svm::camera;
 using namespace svm::shader;
 using namespace svm::texture;
@@ -37,28 +39,6 @@ indexed_triangle triangles[2] = {
     { 2, 3, 0 }
 };
 
-const char* vshader_src =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec2 aTexCoord;\n"
-    "out vec2 TexCoord;\n"
-    "uniform mat4 camera;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = camera * vec4(aPos, 1.0);\n"
-    "    TexCoord = aTexCoord;\n"
-    "}\n";
-
-const char* fshader_src =
-    "#version 330 core\n"
-    "in vec2 TexCoord;\n"
-    "out vec4 FragColor;\n"
-    "uniform sampler2D ourTexture;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = texture(ourTexture, TexCoord);\n"
-    "}\n"; 
-
 int main(int argc, const char* argv[])
 {
     if (argc != 2)
@@ -72,15 +52,13 @@ int main(int argc, const char* argv[])
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    VertexArrayBuffer vao(vertices, ARRAY_SIZE(vertices), triangles, ARRAY_SIZE(triangles));
-    ShaderProgram program(vshader_src, fshader_src);
-    program.setUniformInt("ourTexture", 0);
     Texture2D texture = Texture2D::from_file(argv[1]);
-    texture.insert_to_unit_spot(GL_TEXTURE0);
+    Background scene(std::move(texture), glm::vec2(0.25, 0.75), glm::vec2(0.75, 0.25),
+        glm::vec2(0.5, 0.5), 54);
 
     Camera camera;
-    camera.z = 3;
-    camera.set_screen(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    camera.set_screen(texture.width(), texture.height());
+    scene.orient_camera_initially(camera);
     float last_cursor_x = 0.0;
     float last_cursor_y = 0.0;
     bool first_cursor_input = true;
@@ -118,9 +96,7 @@ int main(int argc, const char* argv[])
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        program.setUniformMat4("camera", camera.get_view_projection());
-
-        vao.draw_elements();
+        scene.render(camera.get_view_projection());
 
         window.swap_buffers();
         Window::poll_events();
