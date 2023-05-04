@@ -22,6 +22,11 @@ static constexpr const int DEFAULT_WIDTH = 800;
 static constexpr const int DEFAULT_HEIGHT = 600;
 static constexpr const char* const DEFAULT_TITLE = "Single View Modeling";
 
+glm::vec2 gl_coords_to_tex_coords(const glm::vec2& v)
+{
+    return (v + glm::vec2(1.0f, 1.0f)) / 2.0f;
+}
+
 int main(int argc, const char* argv[])
 {
     if (argc != 2)
@@ -51,7 +56,13 @@ int main(int argc, const char* argv[])
         if (scene == &mesh && mesh.should_switch_scenes())
         {
             scene = &bg;
-            bg.set_user_params(mesh.top_left, mesh.bot_right, mesh.vanishing, 54.0f);
+            bg.set_user_params
+            (
+                gl_coords_to_tex_coords(mesh.top_left),
+                gl_coords_to_tex_coords(mesh.bot_right),
+                gl_coords_to_tex_coords(mesh.vanishing),
+                54.0f
+            );
             scene->setup(window);
             continue;
         }
