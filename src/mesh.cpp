@@ -38,10 +38,13 @@ namespace
         { { 0.0, 1.0, TEX_Z }, { 0.0, 1.0 } }
     };
 
-    glm::vec2 screen_2_gl(svm::window::Window& window, const glm::vec2& screen)
+    glm::vec2 screen_2_gl
+    (
+        const std::shared_ptr<svm::window::Window>& window,
+        const glm::vec2& screen)
     {
         float gl_x, gl_y;
-        window.screen_2_gl(screen.x, screen.y, gl_x, gl_y);
+        window->screen_2_gl(screen.x, screen.y, gl_x, gl_y);
         return glm::vec2(gl_x, gl_y);
     }
 }
@@ -67,22 +70,22 @@ Mesh::Mesh(const std::shared_ptr<texture::Texture2D>& tex)
     recalculate_mesh();
 }
 
-void Mesh::setup(window::Window& window)
+void Mesh::setup(const window_ptr_t& window)
 {
     const int win_height = 640;
     const int win_width = win_height * m_tex->width() / m_tex->height();
-    window.set_cursor_enabled(true);
-    window.set_window_size(win_width, win_height);
-    window.enforce_aspect_ratio(m_tex->width(), m_tex->height());
+    window->set_cursor_enabled(true);
+    window->set_window_size(win_width, win_height);
+    window->enforce_aspect_ratio(m_tex->width(), m_tex->height());
 
     top_left = glm::vec2(win_width * 0.25, win_height * 0.25);
     bot_right = glm::vec2(win_width * 0.75, win_height * 0.75);
     vanishing = glm::vec2(win_width * 0.5, win_height * 0.5);
 }
 
-void Mesh::process_input(window::Window& window)
+void Mesh::process_input(const window_ptr_t& window, float)
 {
-    if (window.key_is_pressed(GLFW_KEY_ENTER))
+    if (window->key_is_pressed(GLFW_KEY_ENTER))
     {
         // Convert screen coords to GL texture coords
         top_left = screen_2_gl(window, top_left);
@@ -92,10 +95,10 @@ void Mesh::process_input(window::Window& window)
         return;
     }
 
-    if (window.is_cursor_pressed())
+    if (window->is_cursor_pressed())
     {
         double cursor_x, cursor_y;
-        window.get_cursor_pos(cursor_x, cursor_y);
+        window->get_cursor_pos(cursor_x, cursor_y);
 
         if (m_dragging_edge == VANISHING)
         {
@@ -166,7 +169,7 @@ void Mesh::process_input(window::Window& window)
     }
 }
 
-void Mesh::render(window::Window& window)
+void Mesh::render(const window_ptr_t& window, float)
 {
     m_tex_prog.use();
     m_tex->insert_to_unit_spot(0);

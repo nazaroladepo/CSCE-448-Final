@@ -3,16 +3,16 @@
 #include <glm/vec2.hpp>
 #include <memory>
 
+#include "scene.h"
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
-#include "window.h"
 
 namespace svm
 {
 namespace mesh
 {
-class Mesh
+class Mesh: public scene::Scene
 {
 public:
     Mesh(const std::shared_ptr<texture::Texture2D>& tex);
@@ -21,11 +21,9 @@ public:
     glm::vec2 bot_right;
     glm::vec2 vanishing;
 
-    void setup(window::Window& window);
-
-    void process_input(window::Window& window);
-
-    void render(window::Window& window);
+    void setup(const window_ptr_t& window) override;
+    void process_input(const window_ptr_t& window, float frame_time) override;
+    void render(const window_ptr_t& window, float frame_time) override;
 
     bool should_switch_scenes() const;
 
