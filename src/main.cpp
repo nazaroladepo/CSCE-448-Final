@@ -1,21 +1,14 @@
 #include <iostream>
 
 #include "background.h"
-#include "camera.h"
 #include "mesh.h"
-#include "shader.h"
 #include "texture.h"
-#include "vertex.h"
 #include "window.h"
 
-using namespace svm;
 using namespace svm::background;
-using namespace svm::camera;
 using namespace svm::mesh;
 using namespace svm::scene;
-using namespace svm::shader;
 using namespace svm::texture;
-using namespace svm::vertex;
 using namespace svm::window;
 
 static constexpr const int DEFAULT_WIDTH = 800;
