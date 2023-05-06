@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "mesh.h"
 #include "window.h"
@@ -75,9 +76,7 @@ Mesh::Mesh(const std::shared_ptr<texture::Texture2D>& tex)
     , m_dot_vao(dot_verts, 4, quad_tris, 2)
     , m_dragging_edge(-1)
     , m_done(false)
-{
-    recalculate_mesh();
-}
+{}
 
 void Mesh::setup(const window_ptr_t& window)
 {
@@ -91,9 +90,7 @@ void Mesh::setup(const window_ptr_t& window)
     bot_right = glm::vec2(win_width * 0.75, win_height * 0.75);
     vanishing = glm::vec2(win_width * 0.5, win_height * 0.5);
 
-    std::cout << "top_left " << top_left.x << ' ' << top_left.y << std::endl;
-    std::cout << "bot_right " << bot_right.x << ' ' << bot_right.y << std::endl;
-    std::cout << "vanishing " << vanishing.x << ' ' << vanishing.y << std::endl;
+    recalculate_mesh(window);
 }
 
 void Mesh::process_input(const window_ptr_t& window, float)
@@ -112,7 +109,6 @@ void Mesh::process_input(const window_ptr_t& window, float)
     {
         double cursor_x, cursor_y;
         window->get_cursor_pos(cursor_x, cursor_y);
-        std::cout << "(" << cursor_x << ", " << cursor_y << ")" << std::endl;
 
         if (m_dragging_edge == VANISHING)
         {
@@ -151,7 +147,6 @@ void Mesh::process_input(const window_ptr_t& window, float)
             } else {
                 m_dragging_edge = -1;
             }
-            std::cout << "Began dragging " << m_dragging_edge << std::endl;
         }
 
         if (bot_right.y < top_left.y)
@@ -178,7 +173,7 @@ void Mesh::process_input(const window_ptr_t& window, float)
             }
         }
 
-        recalculate_mesh();
+        recalculate_mesh(window);
     }
     else
     {
@@ -193,8 +188,8 @@ void Mesh::render(const window_ptr_t& window, float)
     m_tex->insert_to_unit_spot(0);
     m_tex_vao.draw_elements();
 
-    //m_mesh_prog.use();
-    //m_mesh_vao.draw_elements();
+    m_mesh_prog.use();
+    m_mesh_vao.draw_elements();
 
     static constexpr const glm::vec3 REAR_DOTS_COLOR = glm::vec3(1.0f, 0.0f, 0.0f);
     static constexpr const glm::vec3 VANISHING_COLOR = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -237,8 +232,32 @@ bool Mesh::should_switch_scenes() const
     return m_done;
 }
 
-void Mesh::recalculate_mesh()
+void Mesh::recalculate_mesh(const window_ptr_t& window)
 {
+    const glm::vec2 top_left_gl = screen_2_gl(window, top_left);
+    const glm::vec2 top_right_gl = screen_2_gl(window, {bot_right.x, top_left.y});
+    const glm::vec2 bot_left_gl = screen_2_gl(window, {top_left.x, bot_right.y});
+    const glm::vec2 bot_right_gl = screen_2_gl(window, bot_right);
+    const glm::vec2 vp_gl = screen_2_gl(window, vanishing);
+
+    std::vector<vertex::vertex3_element> verts = 
+    {
+        { { vp_gl.x, vp_gl.y, 0.0f } , {} },
+        { { top_left_gl.x, top_left_gl.y, 0.0f } , {} },
+        { { top_right_gl.x, top_right_gl.y, 0.0f } , {} },
+        { { bot_left_gl.x, bot_left_gl.y, 0.0f } , {} },
+        { { bot_right_gl.x, bot_right_gl.y, 0.0f } , {} }
+    };
+
+    std::vector<vertex::indexed_line> lines = 
+    {
+        { 1, 2 },
+        { 2, 3 },
+        { 3, 4 },
+        { 4, 1 }
+    };
+
+    m_mesh_vao = vertex::VertexArrayBuffer(&verts[0], verts.size(), &lines[0], lines.size());
 }
 } // namespace mash
 } // namespace svm

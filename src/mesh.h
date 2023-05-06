@@ -28,7 +28,7 @@ public:
     bool should_switch_scenes() const;
 
 private:
-    void recalculate_mesh();
+    void recalculate_mesh(const window_ptr_t& window);
 
     shader::ShaderProgram m_tex_prog;
     shader::ShaderProgram m_mesh_prog;

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <glad/glad.h>
+#include <utility>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
@@ -16,6 +17,9 @@ struct vertex3_element
 };
 
 using indexed_triangle = GLuint[3];
+using indexed_line = std::pair<GLuint, GLuint>;
+static_assert(sizeof(indexed_line) == 2 * sizeof(GLuint),
+    "Pair packing will not work in this configuration");
 
 class VertexArrayBuffer
 {
@@ -26,6 +30,14 @@ public:
         GLsizei num_verts,
         const indexed_triangle* triangles,
         GLsizei num_triangles
+    );
+
+    VertexArrayBuffer
+    (
+        const vertex3_element* verts,
+        GLsizei num_verts,
+        const indexed_line* lines,
+        GLsizei num_lines
     );
 
     VertexArrayBuffer() = default;
@@ -46,7 +58,8 @@ private:
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_ebo;
-    GLsizei m_num_triangles;
+    GLint m_draw_mode;
+    GLsizei m_num_elements;
 };
 } // namespace window
 } // namespace svm

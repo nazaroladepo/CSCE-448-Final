@@ -17,7 +17,11 @@ supported by default with the drivers of any modern GPU, and CMake 3.1.
 
 ### Linux and macOS
 
+```bash
+    git clone --recursive URL_TO_THIS_REPO svm # note the recursive flag
+    cd svm
     ./build.sh
+```
 
 ## How to Run
 
