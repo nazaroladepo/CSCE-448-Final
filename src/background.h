@@ -34,7 +34,6 @@ private:
         const glm::vec2& view_top_left,
         const glm::vec2& bot_right,
         const glm::vec2& vanishing,
-        float fovy,
         vertex::vertex3_element tex_uv[12]
     );
 

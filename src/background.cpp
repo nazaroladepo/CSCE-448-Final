@@ -50,7 +50,7 @@ void Background::set_user_params
     m_camera.fovy = fovy;
 
     vertex::vertex3_element verts[12];
-    calculate_tex_2d(top_left, bot_right, vanishing, fovy, verts);
+    calculate_tex_2d(top_left, bot_right, vanishing, verts);
     calculate_box_3d(top_left, bot_right, vanishing, fovy, verts);
 
     vertex::indexed_triangle triangles[10] =
@@ -151,7 +151,6 @@ void Background::calculate_tex_2d
     const glm::vec2& top_left,
     const glm::vec2& bot_right,
     const glm::vec2& vanishing,
-    float fovy,
     vertex::vertex3_element tex_uv[12]
 )
 {
@@ -192,30 +191,46 @@ void Background::calculate_tex_2d
 
 void Background::calculate_box_3d
 (
-    const glm::vec2& top_left,
-    const glm::vec2& bot_right,
-    const glm::vec2& vanishing,
+    const glm::vec2& top_left_,
+    const glm::vec2& bot_right_,
+    const glm::vec2& vanishing_,
     float fovy,
     vertex::vertex3_element box_coords[12]
 )
 {
     const float tex_width = m_texture->width();
     const float tex_height = m_texture->height();
-    const float rear_w_img = bot_right.x - top_left.x;
-    const float rear_h_img = top_left.y - bot_right.y;
-    const float rear_aspect = (rear_w_img / rear_h_img) * (tex_width / tex_height);
+    const glm::vec2 tex_dimensions(tex_width / tex_height, 1.0f);
+
+    const glm::vec2 top_left_view = comp_mul(top_left_, tex_dimensions);
+    const glm::vec2 bot_right_view = comp_mul(bot_right_, tex_dimensions);
+    const glm::vec2 vanishing_view = comp_mul(vanishing_, tex_dimensions);
+
+    const float rear_width_view = bot_right_view.x - top_left_view.x;
+    const float rear_height_view = top_left_view.y - bot_right_view.y;
+    const float rear_aspect = rear_width_view / rear_height_view;
 
     const float rear_w = REAR_H * rear_aspect;
     const float box_depth = rear_w; // @TODO: replace
 
-    const float degrees_from_floor = (vanishing.y - bot_right.y) / (top_left.y - bot_right.y) * fovy;
+    const float degrees_from_floor = (vanishing_view.y - bot_right_view.y) / rear_height_view * fovy;
 
-    m_camera.x = (vanishing.x - top_left.x) / (bot_right.x - top_left.x) * rear_w; // ...
-    m_camera.y = (vanishing.y - bot_right.y) / (top_left.y - bot_right.y) * REAR_H; // ...
+    m_camera.x = (vanishing_view.x - top_left_view.x) / rear_width_view * rear_w; // ...
+    m_camera.y = (vanishing_view.y - bot_right_view.y) / rear_height_view * REAR_H; // ...
     m_camera.z = m_camera.y / glm::tan(glm::radians(degrees_from_floor)); // ...
-    std::cout << "camera: " << m_camera.x << ' ' << m_camera.y << ' ' << m_camera.z << std::endl;
-    std::cout << fovy << std::endl;
-    std::cout << rear_w << ' ' << REAR_H <<  ' ' << box_depth << std::endl;
+    //std::cout << "camera: " << m_camera.x << ' ' << m_camera.y << ' ' << m_camera.z << std::endl;
+    //std::cout << fovy << std::endl;
+    //std::cout << rear_w << ' ' << REAR_H <<  ' ' << box_depth << std::endl;
+
+    const auto calc_box_z = [&](int n) -> float
+    {
+        //const glm::vec2 tex_uv = glm::vec2(box_coords[n].texture_uv[0], box_coords[n].texture_uv[0])
+        //    * tex_dimensions;
+        //const float dist_from_vp_view = glm::length(tex_uv - vanishing_view);
+        //const float degrees_from_vp = dist_from_vp_view * fovy;
+        //return dist_from_vp_view * rear_w;
+        return box_depth;
+    };
 
     // 1
     box_coords[0].xyz[0] = 0; //
@@ -228,19 +243,19 @@ void Background::calculate_box_3d
     // 3
     box_coords[2].xyz[0] = 0; // 
     box_coords[2].xyz[1] = 0; //
-    box_coords[2].xyz[2] = box_depth;
+    box_coords[2].xyz[2] = calc_box_z(2);
     // 4
     box_coords[3].xyz[0] = rear_w;
     box_coords[3].xyz[1] = 0; //
-    box_coords[3].xyz[2] = box_depth;
+    box_coords[3].xyz[2] = calc_box_z(3);
     // 5
     box_coords[4].xyz[0] = 0; //
     box_coords[4].xyz[1] = 0; //
-    box_coords[4].xyz[2] = box_depth;
+    box_coords[4].xyz[2] = calc_box_z(4);
     // 6
     box_coords[5].xyz[0] = rear_w;
     box_coords[5].xyz[1] = 0; //
-    box_coords[5].xyz[2] = box_depth;
+    box_coords[5].xyz[2] = calc_box_z(5);
     // 7
     box_coords[6].xyz[0] = 0; //
     box_coords[6].xyz[1] = REAR_H;
@@ -252,19 +267,19 @@ void Background::calculate_box_3d
     // 9
     box_coords[8].xyz[0] = 0; //
     box_coords[8].xyz[1] = REAR_H;
-    box_coords[8].xyz[2] = box_depth;
+    box_coords[8].xyz[2] = calc_box_z(8);
     // 10
     box_coords[9].xyz[0] = rear_w;
     box_coords[9].xyz[1] = REAR_H;
-    box_coords[9].xyz[2] = box_depth;
+    box_coords[9].xyz[2] = calc_box_z(9);
     // 11
     box_coords[10].xyz[0] = 0; //
     box_coords[10].xyz[1] = REAR_H;
-    box_coords[10].xyz[2] = box_depth;
+    box_coords[10].xyz[2] = calc_box_z(10);
     // 12
     box_coords[11].xyz[0] = rear_w;
     box_coords[11].xyz[1] = REAR_H;
-    box_coords[11].xyz[2] = box_depth;
+    box_coords[11].xyz[2] = calc_box_z(11);
 }
 } // namespace background
 } // namespace svm

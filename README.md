@@ -11,7 +11,8 @@ Next, the application starts on the mesh screen where the user selects four corn
 wall" and the vanishing point. When you are setting the corner points, instead of dragging the
 corner points themselves, drag the edges of the box. However, you can drag the vanishing point like 
 normal. Use the mesh lines eminating from the selected vanishing point to help guide the points so
-that the mesh aligns with lines in the image parallel to the camera.
+that the mesh aligns with lines in the image parallel to the camera. The red points are the rear
+wall corner points and the green point is the vanishing point.
 
 When you are done setting the points, hit the enter key on your keyboard. This brings you into 
 theater mode. Use your mouse to look around, and WASD to move the camera. Look at all the new
