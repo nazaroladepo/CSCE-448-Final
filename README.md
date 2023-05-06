@@ -1,5 +1,21 @@
 # CSCE 438 Final Project: Single-View Modeling
 
+## Usage
+
+To start the application, a user must provide a path to an image file as the first argument on the
+command line. For example:
+
+    ./build/single_view_modeling ~/Downloads/reveille.jpg
+
+Next, the application starts on the mesh screen where the user selects four corners of the "rear
+wall" and the vanishing point. Use the mesh lines eminating from the selected vanishing point to
+help guide the points so that the mesh aligns with lines in the image parallel to the camera.
+
+When you are done setting the points, hit the enter key on your keyboard. This brings you into 
+theater mode. Use your mouse to look around, and WASD to move the camera. Look at all the new
+perspectives that can be made from a flat 2D image! When you are done, press the escape key on the
+kayboard.
+
 ## Dependencies
 
 The only dependencies needed to compile and run this project is OpenGL 3.3, which should come
