@@ -239,7 +239,6 @@ bool Mesh::should_switch_scenes() const
 
 void Mesh::recalculate_mesh()
 {
-
 }
 } // namespace mash
 } // namespace svm

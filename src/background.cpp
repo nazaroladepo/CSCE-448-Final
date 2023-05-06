@@ -1,3 +1,4 @@
+#include <iostream>
 #include <utility>
 
 #include "background.h"
@@ -9,6 +10,16 @@ constexpr float REAR_H = 20; // arbitrary
 glm::vec2 comp_mul(const glm::vec2& a, const glm::vec2& b)
 {
     return glm::vec2(a.x * b.x, a.y * b.y);
+}
+
+glm::vec2 x_intersect_at_y(float y, const glm::vec2& p1, const glm::vec2& p2)
+{
+    return {(p1.x - p2.x)/(p1.y - p2.y) * (y - p1.y) + p1.x, y};
+}
+
+glm::vec2 y_intersect_at_x(float x, const glm::vec2& p1, const glm::vec2& p2)
+{
+    return {x, (p1.y - p2.y)/(p1.x - p2.x) * (x - p1.x) + p1.y};
 }
 } // anonymous namespace
 
@@ -106,7 +117,7 @@ void Background::setup(const window_ptr_t& window)
     });
 }
 
-void Background::process_input(const window_ptr_t& window, float frame_time)
+void Background::process_input(const window_ptr_t& window, float)
 {
     constexpr float move_size = 0.05;
     if (window->key_is_pressed(GLFW_KEY_W))
@@ -127,7 +138,7 @@ void Background::process_input(const window_ptr_t& window, float frame_time)
     }
 }
 
-void Background::render(const window_ptr_t& window, float frame_time)
+void Background::render(const window_ptr_t&, float)
 {
     m_prog.use();
     m_prog.setUniformMat4("camera", m_camera.get_view_projection());
@@ -144,42 +155,39 @@ void Background::calculate_tex_2d
     vertex::vertex3_element tex_uv[12]
 )
 {
-    // 1
-    tex_uv[0].texture_uv[0] = top_left.x;
-    tex_uv[0].texture_uv[1] = bot_right.y;
-    // 2
-    tex_uv[1].texture_uv[0] = bot_right.x;
-    tex_uv[1].texture_uv[1] = bot_right.y;
-    // 3
-    tex_uv[2].texture_uv[0] = 0.0;
-    tex_uv[2].texture_uv[1] = 0.0;
-    // 4
-    tex_uv[3].texture_uv[0] = 1.0;
-    tex_uv[3].texture_uv[1] = 0.0;
-    // 5
-    tex_uv[4].texture_uv[0] = 0.0;
-    tex_uv[4].texture_uv[1] = 0.0;
-    // 6
-    tex_uv[5].texture_uv[0] = 1.0;
-    tex_uv[5].texture_uv[1] = 0.0;
-    // 7
-    tex_uv[6].texture_uv[0] = top_left.x;
-    tex_uv[6].texture_uv[1] = top_left.y;
-    // 8
-    tex_uv[7].texture_uv[0] = bot_right.x;
-    tex_uv[7].texture_uv[1] = top_left.y;
-    // 9
-    tex_uv[8].texture_uv[0] = 0.0;
-    tex_uv[8].texture_uv[1] = 1.0;
-    // 10
-    tex_uv[9].texture_uv[0] = 1.0;
-    tex_uv[9].texture_uv[1] = 1.0;
-    // 11
-    tex_uv[10].texture_uv[0] = 0.0;
-    tex_uv[10].texture_uv[1] = 1.0;
-    // 12
-    tex_uv[11].texture_uv[0] = 1.0;
-    tex_uv[11].texture_uv[1] = 1.0;
+    const glm::vec2 bot_left(top_left.x, bot_right.y);
+    const glm::vec2 top_right(bot_right.x, top_left.y);
+
+    const auto vp_intersect_at_x = [vanishing](float x, const glm::vec2& corner)
+        -> glm::vec2
+    {
+        return y_intersect_at_x(x, corner, vanishing);
+    };
+
+    const auto vp_intersect_at_y = [vanishing](float y, const glm::vec2& corner)
+        -> glm::vec2
+    {
+        return x_intersect_at_y(y, corner, vanishing);
+    };
+
+    const auto assign_nth_point = [&tex_uv](int n, const glm::vec2& val)
+    {
+        tex_uv[n - 1].texture_uv[0] = val.x;
+        tex_uv[n - 1].texture_uv[1] = val.y;
+    };
+
+    assign_nth_point(1, bot_left);
+    assign_nth_point(2, bot_right);
+    assign_nth_point(3, vp_intersect_at_y(0, bot_left));
+    assign_nth_point(4, vp_intersect_at_y(0, bot_right));
+    assign_nth_point(5, vp_intersect_at_x(0, bot_left));
+    assign_nth_point(6, vp_intersect_at_x(1, bot_right));
+    assign_nth_point(7, top_left);
+    assign_nth_point(8, top_right);
+    assign_nth_point(9, vp_intersect_at_y(1, top_left));
+    assign_nth_point(10, vp_intersect_at_y(1, top_right));
+    assign_nth_point(11, vp_intersect_at_x(0, top_left));
+    assign_nth_point(12, vp_intersect_at_x(1, top_right));
 }
 
 void Background::calculate_box_3d
@@ -193,13 +201,21 @@ void Background::calculate_box_3d
 {
     const float tex_width = m_texture->width();
     const float tex_height = m_texture->height();
-    const glm::vec2 tex_dimensions(tex_width, tex_height);
-    const glm::vec2 tl = comp_mul(top_left, tex_dimensions);
-    const glm::vec2 br = comp_mul(bot_right, tex_dimensions);
-    const glm::vec2 vp_in_rear = comp_mul(vanishing, tex_dimensions);
+    const float rear_w_img = bot_right.x - top_left.x;
+    const float rear_h_img = top_left.y - bot_right.y;
+    const float rear_aspect = (rear_w_img / rear_h_img) * (tex_width / tex_height);
 
-    const float rear_w = REAR_H * tex_width / tex_height;
+    const float rear_w = REAR_H * rear_aspect;
     const float box_depth = rear_w; // @TODO: replace
+
+    const float degrees_from_floor = (vanishing.y - bot_right.y) / (top_left.y - bot_right.y) * fovy;
+
+    m_camera.x = (vanishing.x - top_left.x) / (bot_right.x - top_left.x) * rear_w; // ...
+    m_camera.y = (vanishing.y - bot_right.y) / (top_left.y - bot_right.y) * REAR_H; // ...
+    m_camera.z = m_camera.y / glm::tan(glm::radians(degrees_from_floor)); // ...
+    std::cout << "camera: " << m_camera.x << ' ' << m_camera.y << ' ' << m_camera.z << std::endl;
+    std::cout << fovy << std::endl;
+    std::cout << rear_w << ' ' << REAR_H <<  ' ' << box_depth << std::endl;
 
     // 1
     box_coords[0].xyz[0] = 0; //
@@ -249,10 +265,6 @@ void Background::calculate_box_3d
     box_coords[11].xyz[0] = rear_w;
     box_coords[11].xyz[1] = REAR_H;
     box_coords[11].xyz[2] = box_depth;
-
-    m_camera.x = 0; // ...
-    m_camera.y = 0; // ...
-    m_camera.z = 3; // ...
 }
 } // namespace background
 } // namespace svm
