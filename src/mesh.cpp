@@ -1,3 +1,4 @@
+#include <glm/trigonometric.hpp>
 #include <iostream>
 #include <vector>
 
@@ -68,7 +69,7 @@ Mesh::Mesh(const std::shared_ptr<texture::Texture2D>& tex)
     , bot_right()
     , vanishing()
     , m_tex_prog(shader::ShaderProgram::textured_object()) 
-    , m_mesh_prog(shader::ShaderProgram::flat_color(glm::vec4(1.0, 1.0, 1.0, 1.0)))
+    , m_mesh_prog(shader::ShaderProgram::flat_color(glm::vec4(1.0, 0.0, 0.0, 1.0)))
     , m_dot_prog(shader::ShaderProgram::gui_dot(glm::vec3(1.0, 0, 0), DOT_RADIUS))
     , m_tex(tex)
     , m_tex_vao(ui_tex_verts, 4, quad_tris, 2)
@@ -188,6 +189,7 @@ void Mesh::render(const window_ptr_t& window, float)
     m_tex->insert_to_unit_spot(0);
     m_tex_vao.draw_elements();
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     m_mesh_prog.use();
     m_mesh_vao.draw_elements();
 
@@ -211,6 +213,8 @@ void Mesh::render(const window_ptr_t& window, float)
     std::cout << bot_left_gl << std::endl;
     std::cout << top_right_gl << std::endl;
     std::cout << vanishing_gl << std::endl;*/
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     m_dot_prog.setUniformVec3("flat_color", REAR_DOTS_COLOR);
     m_dot_prog.setUniformVec3("dot_center", top_left_gl);
@@ -242,20 +246,34 @@ void Mesh::recalculate_mesh(const window_ptr_t& window)
 
     std::vector<vertex::vertex3_element> verts = 
     {
-        { { vp_gl.x, vp_gl.y, 0.0f } , {} },
-        { { top_left_gl.x, top_left_gl.y, 0.0f } , {} },
-        { { top_right_gl.x, top_right_gl.y, 0.0f } , {} },
-        { { bot_left_gl.x, bot_left_gl.y, 0.0f } , {} },
-        { { bot_right_gl.x, bot_right_gl.y, 0.0f } , {} }
+        { { vp_gl.x, vp_gl.y, MESH_Z } , {} },
+        { { top_left_gl.x, top_left_gl.y, MESH_Z } , {} },
+        { { top_right_gl.x, top_right_gl.y, MESH_Z } , {} },
+        { { bot_left_gl.x, bot_left_gl.y, MESH_Z } , {} },
+        { { bot_right_gl.x, bot_right_gl.y, MESH_Z } , {} }
     };
 
     std::vector<vertex::indexed_line> lines = 
     {
         { 1, 2 },
-        { 2, 3 },
-        { 3, 4 },
-        { 4, 1 }
+        { 2, 4 },
+        { 4, 3 },
+        { 3, 1 }
     };
+
+    const auto add_vp_line = [&verts, &lines, vp_gl](const float rad)
+    {
+        const float l = 1.5;
+        const float x = l * glm::cos(rad) + vp_gl.x;
+        const float y = l * glm::sin(rad) + vp_gl.y;
+        verts.push_back({{ x, y, MESH_Z }, {}});
+        lines.emplace_back(0, verts.size() - 1);
+    };
+
+    add_vp_line(glm::atan(top_left_gl.y - vp_gl.y, top_left_gl.x - vp_gl.x));
+    add_vp_line(glm::atan(top_right_gl.y - vp_gl.y, top_right_gl.x - vp_gl.x));
+    add_vp_line(glm::atan(bot_left_gl.y - vp_gl.y, bot_left_gl.x - vp_gl.x));
+    add_vp_line(glm::atan(bot_right_gl.y - vp_gl.y, bot_right_gl.x - vp_gl.x));
 
     m_mesh_vao = vertex::VertexArrayBuffer(&verts[0], verts.size(), &lines[0], lines.size());
 }

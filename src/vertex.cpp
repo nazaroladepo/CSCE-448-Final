@@ -51,7 +51,7 @@ VertexArrayBuffer::VertexArrayBuffer
     : m_vao(0)
     , m_vbo(0)
     , m_ebo(0)
-    , m_draw_mode(GL_LINE)
+    , m_draw_mode(GL_LINES)
     , m_num_elements(2 * num_lines)
 {
     // Generate buffer and vertex array buffers

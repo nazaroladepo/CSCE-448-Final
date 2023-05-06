@@ -32,6 +32,8 @@ int main(int argc, const char* argv[])
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(5);
 
     std::shared_ptr<Texture2D> texture(Texture2D::from_file(argv[1]));
     Mesh mesh(texture);
